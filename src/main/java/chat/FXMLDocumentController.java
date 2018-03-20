@@ -14,8 +14,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import message.MessageObject;
+import message.MessageFactory;
 import message.MessageType;
+import message.MsgBase;
 
 /**
 
@@ -35,7 +36,9 @@ public class FXMLDocumentController implements Initializable
             }
 
             String crtMsg = currentMessage.getText();
-            clInstance.SendMessage(new MessageObject(MessageType.CHAT_MSG_EVENT, crtMsg));
+
+            MsgBase messageMsg = MessageFactory.createMessage(MessageType.MESSAGE, userNameCtrl.getText(), crtMsg);
+            clInstance.SendMessage(messageMsg);
             currentMessage.clear();
             
             event.consume(); // Consume Event
@@ -91,8 +94,10 @@ public class FXMLDocumentController implements Initializable
         {
             if (clInstance == null)
                 return;
+
+            MsgBase messageMsg = MessageFactory.createMessage(MessageType.DISCONNECT, userNameCtrl.getText(), "");
             
-            clInstance.SendMessage(new MessageObject(MessageType.LEAVE_CHAT));
+            clInstance.SendMessage(messageMsg);
             clInstance.disconnectFromServer();
             clInstance = null;
             
@@ -103,8 +108,10 @@ public class FXMLDocumentController implements Initializable
         {
             if (clInstance == null)
                 return;
+
+            MsgBase messageMsg = MessageFactory.createMessage(MessageType.LIST_ACTIVE_USERS, userNameCtrl.getText(), "");
             
-            clInstance.SendMessage(new MessageObject(MessageType.LIST_ACTIVE_USERS));
+            clInstance.SendMessage(messageMsg);
         }
         else if (crtString.equalsIgnoreCase("sm"))
         {
@@ -114,7 +121,9 @@ public class FXMLDocumentController implements Initializable
             }
 
             String crtMsg = currentMessage.getText();
-            clInstance.SendMessage(new MessageObject(MessageType.CHAT_MSG_EVENT, crtMsg));
+            MsgBase messageMsg = MessageFactory.createMessage(MessageType.MESSAGE, userNameCtrl.getText(), crtMsg);
+
+            clInstance.SendMessage(messageMsg);
             currentMessage.clear();
         }
         else if (crtString.equals("cls"))
@@ -145,7 +154,8 @@ public class FXMLDocumentController implements Initializable
 
         if (serverConnectedOk)
         {
-            clInstance.SendMessage(new MessageObject(MessageType.LEAVE_CHAT));
+            MsgBase messageMsg = MessageFactory.createMessage(MessageType.DISCONNECT, userNameCtrl.getText(), "");
+            clInstance.SendMessage(messageMsg);
             clInstance.disconnectFromServer();
             clInstance = null;
         }

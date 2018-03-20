@@ -5,24 +5,25 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import message.MessageObject;
+
+import message.MessageFactory;
+import message.MessageMsg;
 import message.MessageType;
+import message.MsgBase;
 
 /**
- A client application used for connecting to a chat server and talking to other users.
- @author Razvan
+ * A client application used for connecting to a chat server and talking to other users.
  */
 public class Client
 {
 
-    // - Ctors
-    
     /**
-    Construct a client that communicates with the specified server on the provided port.
-    @param servAddress The server's ip address.
-    @param serverPort  The server port.
-    @param usrName     The user name used for identification purposes on the server.
-    */
+     * Construct a client that communicates with the specified server on the provided port.
+     *
+     * @param servAddress The server's ip address.
+     * @param serverPort  The server port.
+     * @param usrName     The user name used for identification purposes on the server.
+     */
     public Client(String servAddress, int serverPort, String usrName)
     {
         serverAddress = servAddress;
@@ -32,14 +33,15 @@ public class Client
         crtMessagePrinter = new MessagePrinterConsole("");
         crtListener = null;
     }
-    
+
     /**
-    Construct a client that communicates with the specified server on the provided port.
-    @param servAddress The server's ip address.
-    @param serverPort  The server port.
-    @param usrName     The user name used for identification purposes on the server.
-    @param msgPrinter  The message printer where the output will be printed in. (only for a non console application)
-    */
+     * Construct a client that communicates with the specified server on the provided port.
+     *
+     * @param servAddress The server's ip address.
+     * @param serverPort  The server port.
+     * @param usrName     The user name used for identification purposes on the server.
+     * @param msgPrinter  The message printer where the output will be printed in. (only for a non console application)
+     */
     public Client(String servAddress, int serverPort, String usrName, MessagePrinter msgPrinter)
     {
         serverAddress = servAddress;
@@ -49,22 +51,18 @@ public class Client
         crtMessagePrinter = msgPrinter;
         crtListener = null;
     }
-    
-    
-    // - Accessors
-    
-  
-    
+
     synchronized boolean listenerStopped()
     {
         return !serverListen;
     }
-    
+
     /**
-    Send a message to the chat server.
-    @param crtMessage The message to be sent.
-    */
-    public void SendMessage(MessageObject crtMessage)
+     * Send a message to the chat server.
+     *
+     * @param crtMessage The message to be sent.
+     */
+    public void SendMessage(MsgBase crtMessage)
     {
         try
         {
@@ -75,14 +73,13 @@ public class Client
             crtMessagePrinter.setString(ClientStrTab.STREAM_COMM_ERR.toString());
             crtMessagePrinter.flushString();
         }
-    }  
-   
-    // - Mutators
-    
+    }
+
     /**
-    Start the current client app and connect to the specified server on the specified port.
+     * Start the current client app and connect to the specified server on the specified port.
+     *
      * @return Indicates if the communication has been established
-    */
+     */
     public boolean start()
     {
         try
@@ -90,47 +87,48 @@ public class Client
             crtSocket = new Socket(serverAddress, nbPort);
         }
         catch (Exception e)
-        {       
+        {
             crtMessagePrinter.setString(ClientStrTab.ERR_CONN_SERVER.toString());
             crtMessagePrinter.flushString();
             return false;
         }
-        
+
         crtMessagePrinter.setString(String.format(ClientStrTab.SRV_CONN_SUCCESFULL.toString(), crtSocket.getInetAddress().toString(), nbPort));
         crtMessagePrinter.flushString();
-        
+
         try
         {
             outputStream = new ObjectOutputStream(crtSocket.getOutputStream());
-            inputStream  = new ObjectInputStream(crtSocket.getInputStream());
+            inputStream = new ObjectInputStream(crtSocket.getInputStream());
         }
         catch (Exception e)
-        {  
+        {
             crtMessagePrinter.setString(ClientStrTab.STREAM_COMM_ERR.toString());
             crtMessagePrinter.flushString();
             return false;
         }
-        
+
         crtListener = new Thread(new SrvEvListener());
         crtListener.start();
-        
+
         try
         {
-            outputStream.writeObject(userName);
+            MsgBase connectMsg = MessageFactory.createMessage(MessageType.CONNECT, userName, "");
+            outputStream.writeObject(connectMsg);
         }
         catch (Exception e)
-        { 
+        {
             crtMessagePrinter.setString(ClientStrTab.STREAM_COMM_ERR.toString());
             crtMessagePrinter.flushString();
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
-    Close the currently input and output streams.
-    */
+     * Close the currently input and output streams.
+     */
     void closeStreams()
     {
         try
@@ -139,15 +137,15 @@ public class Client
             outputStream.close();
         }
         catch (IOException e)
-        {   
+        {
             crtMessagePrinter.setString(ClientStrTab.ERR_CLOSING_RES.toString());
             crtMessagePrinter.flushString();
         }
     }
-    
+
     /**
-    Close the current socket used to communicate with the server.
-    */
+     * Close the current socket used to communicate with the server.
+     */
     void closeSocket()
     {
         try
@@ -155,36 +153,36 @@ public class Client
             crtSocket.close();
         }
         catch (IOException ex)
-        {            
+        {
             crtMessagePrinter.setString(ClientStrTab.ERR_CLOSING_RES.toString());
             crtMessagePrinter.flushString();
         }
     }
-    
+
     /**
-    Disconnect the current client from the server.
-    */
+     * Disconnect the current client from the server.
+     */
     public void disconnectFromServer()
     {
         serverListen = false;
-        
+
         try
-        {       
+        {
             crtListener.join();
         }
         catch (InterruptedException ex)
         {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         closeStreams();
         closeSocket();
     }
-    
+
     public static void main(String[] args)
     {
         int nbArgs = args.length;
-        
+
         if (nbArgs != 3)
         {
             System.out.println(ClientStrTab.IMPROPER_CMD_LINE.toString());
@@ -206,37 +204,39 @@ public class Client
                 String portNbParse = portString.replaceFirst("-", "");
                 String usrParse = userString.replaceFirst("-", "");
                 portNb = Integer.parseInt(portNbParse);
-                
 
                 Client clInstance = new Client(srvParse, portNb, usrParse);
                 clInstance.start();
-                
+
                 Scanner commandScanner = new Scanner(System.in);
-                
+
+                MsgBase disconnectMsg = MessageFactory.createMessage(MessageType.DISCONNECT, usrParse, "");
+                MsgBase listUsrMsg    = MessageFactory.createMessage(MessageType.LIST_ACTIVE_USERS, usrParse, "");
+                MsgBase messageMsg    = MessageFactory.createMessage(MessageType.MESSAGE, usrParse, "");
+
                 while (true)
                 {
                     System.out.print(">");
                     String command = commandScanner.nextLine();
-                    
-                    if (command.equalsIgnoreCase(MessageType.LEAVE_CHAT.toString()))
-                    {                       
-                        clInstance.SendMessage(new MessageObject(MessageType.LEAVE_CHAT));
-                        
+
+                    if (command.equalsIgnoreCase(MessageType.DISCONNECT.toString()))
+                    {
+                        clInstance.SendMessage(disconnectMsg);
                         clInstance.disconnectFromServer();
 
                         clInstance.crtMessagePrinter.setString(ClientStrTab.DISCONNECTED.toString());
                         clInstance.crtMessagePrinter.flushString();
                     }
                     else if (command.equalsIgnoreCase(MessageType.LIST_ACTIVE_USERS.toString()))
-                    {                       
-                        clInstance.SendMessage(new MessageObject(MessageType.LIST_ACTIVE_USERS));
+                    {
+                        clInstance.SendMessage(listUsrMsg);
                     }
                     else
                     {
-                       clInstance.SendMessage(new MessageObject(MessageType.CHAT_MSG_EVENT, command));
-                    }                   
+                        clInstance.SendMessage(messageMsg);
+                    }
                 }
-            }       
+            }
         }
     }
 
@@ -252,9 +252,9 @@ public class Client
     Thread crtListener;
 
     // - Inner classes
-    
+
     /**
-     A threaded class that acts as a listener for server events.
+     * A threaded class that acts as a listener for server events.
      */
     public class SrvEvListener implements Runnable
     {
@@ -266,14 +266,27 @@ public class Client
             {
                 try
                 {
-                    String messageReceived = (String) inputStream.readObject();
-                    
+                    Object messageReceived = inputStream.readObject();
+                    MsgBase baseMsg = (MsgBase) messageReceived;
+                    MessageType msgType = baseMsg.getMessageType();
+                    String messageStringOutput = "";
+
+                    if (msgType == MessageType.MESSAGE)
+                    {
+                        MessageMsg msgObject = (MessageMsg) baseMsg;
+                        messageStringOutput = msgObject.getSenderID() + " : " + msgObject.getMessageBody() + "\n";
+                    }
+                    else
+                    {
+                        messageStringOutput = baseMsg.getSenderID() + " : " + baseMsg.getMessageType().toString() + "\n";
+                    }
+
                     if (listenerStopped())
                     {
                         return;
                     }
 
-                    crtMessagePrinter.setString(messageReceived);
+                    crtMessagePrinter.setString(messageStringOutput);
                     crtMessagePrinter.flushString();
                 }
                 catch (IOException | ClassNotFoundException e)
