@@ -2,7 +2,6 @@ package server;
 
 /**
 The string table used for the server class messages.
-@author Razvan
 */
 enum SrvStrTab
 {
@@ -24,7 +23,7 @@ enum SrvStrTab
     USER_ID_LEFT(12),
     USER_ID_JOINED(13);
     
-    private SrvStrTab(int idx)
+    SrvStrTab(int idx)
     {
         index = idx;
     }
@@ -45,7 +44,7 @@ enum SrvStrTab
         case 2 :
             return "Waiting for clients connections...";
         case 3 :
-            return "User < %s > ID < %d > has been connected.";
+            return "User <%s> has been connected [ID %d].";
         case 4 :
             return "Error encountered while stopping server.";
         case 5 :
@@ -61,15 +60,15 @@ enum SrvStrTab
         case 10 :
             return "Improper command line. Usage is Java Server -portnb -max_connections";
         case 11 :
-            return "User < %s > ID < %d > has been disconnected.";
+            return "User <%s> has been disconnected [ID %d].";
         case 12 :
-            return "%s (ID %d) has left the conversation.";
+            return "%s [ID %d] has left the conversation.";
         case 13 :
-            return "%s (ID %d) has joined the conversation.";
+            return "%s [ID %d] has joined the conversation.";
         }
         
         return "";
     }
     
-    int index;
+    final int index;
 }

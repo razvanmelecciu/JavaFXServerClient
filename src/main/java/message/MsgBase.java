@@ -13,14 +13,14 @@ public abstract class MsgBase implements Serializable
     /**
      * Basic default message constructor (needed for deserialization)
      */
-    protected MsgBase()
+    MsgBase()
     {
     }
 
     /**
      * Get the sender ID for the current message
      *
-     * @return
+     * @return the sender ID string
      */
     public String getSenderID()
     {
@@ -47,7 +47,7 @@ public abstract class MsgBase implements Serializable
     /**
      * Print the object to std out
      *
-     * @return
+     * @return a reference to the current object
      */
     public MsgBase printObjectToStdOut()
     {
@@ -61,20 +61,18 @@ public abstract class MsgBase implements Serializable
     /**
      * Sets the sender ID for the current message
      *
-     * @param sender
-     * @return the current instance for chaining method calls
+     * @param sender the sender of the message
      */
-    public MsgBase setSenderID(String sender)
+    public void setSenderID(String sender)
     {
         senderID = sender;
-        return this;
     }
 
     // - Members
 
 
-    protected String senderID = "";
-    protected MessageType msgType = MessageType.MESSAGE;
-    protected static final String DBG_MSG_TYPE = "<Type>:";
-    protected static final String SENDER_MSG_TYPE = "<Sender>:";
+    private String senderID = "";
+    MessageType msgType = MessageType.MESSAGE;
+    static final String DBG_MSG_TYPE = "<Type>:";
+    static final String SENDER_MSG_TYPE = "<Sender>:";
 }

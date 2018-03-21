@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.effect.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.image.*?>
-
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import java.net.URL?>
 <GridPane alignment="top_left" gridLinesVisible="false" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.FXMLDocumentController">
     <stylesheets>
         <URL value="@newCascadeStyleSheet.css" />
@@ -119,7 +114,7 @@
         <VBox alignment="CENTER" spacing="25">
             <Button id="cls" minHeight="50" minWidth="110" onAction="#handleButtonAction" text="Clear Server Chat" textAlignment="CENTER" wrapText="true">
                 <tooltip>
-                    <Tooltip opacity="0.85" text="Clear the server messsages window" />
+                    <Tooltip opacity="0.85" text="Clear the server messages window" />
                 </tooltip>
             </Button>
             <Button id="au" minHeight="50" minWidth="110" onAction="#handleButtonAction" text="List Users" textAlignment="CENTER" wrapText="true">

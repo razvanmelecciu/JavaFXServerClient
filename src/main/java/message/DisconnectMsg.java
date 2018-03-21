@@ -13,7 +13,7 @@ public final class DisconnectMsg extends MsgBase implements Serializable
     /**
      * Construct a disconnect request object (default ctor needed for deserialization)
      */
-    protected DisconnectMsg()
+    DisconnectMsg()
     {
         msgType = MessageType.DISCONNECT;
         setSenderID("");
@@ -22,9 +22,9 @@ public final class DisconnectMsg extends MsgBase implements Serializable
     /**
      * Construct from an existing object
      *
-     * @param Object
+     * @param sourceObject the RHS object
      */
-    protected DisconnectMsg(final DisconnectMsg sourceObject)
+    private DisconnectMsg(final DisconnectMsg sourceObject)
     {
         setSenderID(sourceObject.getSenderID());
     }
@@ -43,7 +43,7 @@ public final class DisconnectMsg extends MsgBase implements Serializable
     /**
      * Copy the contents from the specified object
      *
-     * @param Source The source object
+     * @param sourceObject The source object
      * @return A reference to the current object
      */
     public DisconnectMsg copyContents(final DisconnectMsg sourceObject)

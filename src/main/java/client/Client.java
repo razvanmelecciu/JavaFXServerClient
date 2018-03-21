@@ -6,13 +6,10 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import message.MessageFactory;
-import message.MessageMsg;
-import message.MessageType;
-import message.MsgBase;
+import message.*;
 
 /**
- * A client application used for connecting to a chat server and talking to other users.
+ * A client application used for connecting to a chat server and talking to other online users.
  */
 public class Client
 {
@@ -24,7 +21,7 @@ public class Client
      * @param serverPort  The server port.
      * @param usrName     The user name used for identification purposes on the server.
      */
-    public Client(String servAddress, int serverPort, String usrName)
+    private Client(String servAddress, int serverPort, String usrName)
     {
         serverAddress = servAddress;
         nbPort = serverPort;
@@ -52,7 +49,7 @@ public class Client
         crtListener = null;
     }
 
-    synchronized boolean listenerStopped()
+    private synchronized boolean listenerStopped()
     {
         return !serverListen;
     }
@@ -93,7 +90,7 @@ public class Client
             return false;
         }
 
-        crtMessagePrinter.setString(String.format(ClientStrTab.SRV_CONN_SUCCESFULL.toString(), crtSocket.getInetAddress().toString(), nbPort));
+        crtMessagePrinter.setString(String.format(ClientStrTab.SRV_CONN_SUCCESSFUL.toString(), crtSocket.getInetAddress().toString(), nbPort));
         crtMessagePrinter.flushString();
 
         try
@@ -129,7 +126,7 @@ public class Client
     /**
      * Close the currently input and output streams.
      */
-    void closeStreams()
+    private void closeStreams()
     {
         try
         {
@@ -146,7 +143,7 @@ public class Client
     /**
      * Close the current socket used to communicate with the server.
      */
-    void closeSocket()
+    private void closeSocket()
     {
         try
         {
@@ -182,6 +179,7 @@ public class Client
     public static void main(String[] args)
     {
         int nbArgs = args.length;
+        int portNb;
 
         if (nbArgs != 3)
         {
@@ -199,7 +197,6 @@ public class Client
             }
             else
             {
-                int portNb = 60010;
                 String srvParse = srvString.replaceFirst("-", "");
                 String portNbParse = portString.replaceFirst("-", "");
                 String usrParse = userString.replaceFirst("-", "");
@@ -241,22 +238,20 @@ public class Client
     }
 
     // - Members
-    ObjectInputStream inputStream;
-    ObjectOutputStream outputStream;
-    Socket crtSocket;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    private Socket crtSocket;
 
     private final String serverAddress, userName;
     private final int nbPort;
-    volatile boolean serverListen;
-    MessagePrinter crtMessagePrinter;
-    Thread crtListener;
-
-    // - Inner classes
+    private volatile boolean serverListen;
+    private final MessagePrinter crtMessagePrinter;
+    private Thread crtListener;
 
     /**
      * A threaded class that acts as a listener for server events.
      */
-    public class SrvEvListener implements Runnable
+    class SrvEvListener implements Runnable
     {
 
         @Override
@@ -269,16 +264,16 @@ public class Client
                     Object messageReceived = inputStream.readObject();
                     MsgBase baseMsg = (MsgBase) messageReceived;
                     MessageType msgType = baseMsg.getMessageType();
-                    String messageStringOutput = "";
+                    String messageStringOutput;
 
                     if (msgType == MessageType.MESSAGE)
                     {
                         MessageMsg msgObject = (MessageMsg) baseMsg;
-                        messageStringOutput = msgObject.getSenderID() + " : " + msgObject.getMessageBody() + "\n";
+                        messageStringOutput = msgObject.getSenderID() + " : " + msgObject.getMessageBody();
                     }
                     else
                     {
-                        messageStringOutput = baseMsg.getSenderID() + " : " + baseMsg.getMessageType().toString() + "\n";
+                        messageStringOutput = baseMsg.getSenderID() + " : " + baseMsg.getMessageType().toString();
                     }
 
                     if (listenerStopped())
@@ -300,14 +295,24 @@ public class Client
         }
     }
 
+    /**
+     * Terminal message printer class for flushing strings
+     */
     class MessagePrinterConsole extends MessagePrinter
     {
 
-        public MessagePrinterConsole(String msg)
+        /**
+         * Create a printer that contains the associated message
+         * @param msg
+         */
+        MessagePrinterConsole(String msg)
         {
             super(msg);
         }
 
+        /**
+         * Flush the specified string
+         */
         @Override
         public void flushString()
         {

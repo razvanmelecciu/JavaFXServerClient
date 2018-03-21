@@ -13,7 +13,7 @@ public final class ConnectMsg extends MsgBase implements Serializable
     /**
      * Construct a connect request object (default ctor needed for deserialization)
      */
-    protected ConnectMsg()
+    ConnectMsg()
     {
         msgType = MessageType.CONNECT;
         setSenderID("");
@@ -22,9 +22,9 @@ public final class ConnectMsg extends MsgBase implements Serializable
     /**
      * Construct from an existing object
      *
-     * @param Object
+     * @param sourceObject the RHS object
      */
-    protected ConnectMsg(final ConnectMsg sourceObject)
+    private ConnectMsg(final ConnectMsg sourceObject)
     {
         setSenderID(sourceObject.getSenderID());
     }
@@ -43,7 +43,7 @@ public final class ConnectMsg extends MsgBase implements Serializable
     /**
      * Copy the contents from the specified object
      *
-     * @param Source The source object
+     * @param sourceObject The source object
      * @return A reference to the current object
      */
     public ConnectMsg copyContents(final ConnectMsg sourceObject)

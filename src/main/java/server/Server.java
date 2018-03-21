@@ -10,21 +10,18 @@ import static java.net.InetAddress.getLocalHost;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import message.MessageFactory;
-import message.MessageType;
-import message.MsgBase;
+import message.*;
 
 /**
  * A server class that uses sockets to connect with multiple clients.
  *
  */
-public class Server
+class Server
 {
 
     /**
@@ -33,19 +30,19 @@ public class Server
      * @param portNumber     The port number
      * @param maxConnections The maximum number of connections
      */
-    public Server(int portNumber, int maxConnections)
+    private Server(int portNumber, int maxConnections)
     {
         this.portNumber = portNumber;
         continueRunning = false;
         maxNbConnections = maxConnections;
-        listClConnections = new ArrayList();
+        listClConnections = new ArrayList<>();
         socketSrv = null;
     }
 
     /**
      * Start listening for incoming connections on the initially specified port.
      */
-    public void start()
+    private void start()
     {
         continueRunning = true;
 
@@ -94,12 +91,9 @@ public class Server
         try
         {
             socketSrv.close();
-            Iterator<ClientConnection> iteratorCol = listClConnections.iterator();
 
-            while (iteratorCol.hasNext())
+            for (ClientConnection crtConn : listClConnections)
             {
-                ClientConnection crtConn = iteratorCol.next();
-
                 crtConn.stopRun();
             }
         }
@@ -137,11 +131,9 @@ public class Server
      */
     synchronized void broadcastClients(MsgBase wireMessage, int clientIDExcluded)
     {
-        ListIterator<ClientConnection> itCrt = listClConnections.listIterator();
 
-        while (itCrt.hasNext())
+        for (ClientConnection crtConn : listClConnections)
         {
-            ClientConnection crtConn = itCrt.next();
             if (crtConn.clientID != clientIDExcluded || !consoleMode)
                 crtConn.writeMsg(wireMessage);
         }
@@ -150,9 +142,9 @@ public class Server
     /**
      * Get the number of connected users (active threads).
      *
-     * @return
+     * @return the number of currently open connections
      */
-    int getNbConnectedUsers()
+    private int getNbConnectedUsers()
     {
         return listClConnections.size();
     }
@@ -202,11 +194,11 @@ public class Server
     }
 
     private ServerSocket socketSrv;
-    List<ClientConnection> listClConnections;
+    final List<ClientConnection> listClConnections;
     private boolean continueRunning;
     private final int portNumber;
     private final int maxNbConnections;
-    static boolean consoleMode = false;
+    private static final boolean consoleMode = false;
 
 }
 
@@ -216,8 +208,6 @@ class ClientConnection extends Thread
     Variable used when sending messages to the clients (to avoid flooding messages)
     */
     private static final long sleepMsgOutputTime = 150;
-
-    // - Ctors
 
     /**
      * Create a connection to the client streams
@@ -239,21 +229,19 @@ class ClientConnection extends Thread
 
             Object clConn = inputStream.readObject();
             MsgBase baseMsg = (MsgBase) clConn;
-            String clientUserName = baseMsg.getSenderID();
+            clientUserName = baseMsg.getSenderID();
 
             String msgJoinedBody = String.format(SrvStrTab.USER_ID_JOINED.toString(), clientUserName, clientID);
             MsgBase messageMsgJoined = MessageFactory.createMessage(MessageType.MESSAGE, "Server", msgJoinedBody);
 
             serverInstance.broadcastClients(messageMsgJoined, clientID);
-            //Server.printMessageStdOut(String.format(SrvStrTab.USER_ID_CONNECTED.toString(), clientUserName, clientID));
+            Server.printMessageStdOut(String.format(SrvStrTab.USER_ID_CONNECTED.toString(), clientUserName, clientID));
         }
         catch (IOException | ClassNotFoundException ex)
         {
             System.out.println("The user name can't be read properly from the connection.");
         }
     }
-
-    // - Mutators
 
     /**
      * Run the specified class (called by a thread start()).
@@ -281,8 +269,6 @@ class ClientConnection extends Thread
                 serverInstance.removeClient(clientID);
             }
 
-            crtEventType = baseMsg.getMessageType();
-
             switch (crtEventType)
             {
                 case MESSAGE :
@@ -301,7 +287,7 @@ class ClientConnection extends Thread
                     continueLoop = false;
 
                     String msgBody = String.format(SrvStrTab.USER_ID_LEFT.toString(), clientUserName, clientID);
-                    MsgBase messageMsgDisconnected = MessageFactory.createMessage(MessageType.MESSAGE, clientUserName, msgBody);
+                    MsgBase messageMsgDisconnected = MessageFactory.createMessage(MessageType.MESSAGE, "Server", msgBody);
 
                     serverInstance.broadcastClients(messageMsgDisconnected, clientID);
                     //Server.printMessageStdOut(String.format(SrvStrTab.USER_ID_DISCONNECTED.toString(), clientUserName, clientID));
@@ -309,20 +295,20 @@ class ClientConnection extends Thread
                 break;
                 case LIST_ACTIVE_USERS :
                 {
-                    String msgBody = SrvStrTab.LIST_USERS.toString() + "\n";
-                    msgBody += "--------------------\n";
+                    StringBuilder msgBody = new StringBuilder(SrvStrTab.LIST_USERS.toString() + "\n");
+                    msgBody.append("--------------------\n");
 
                     ListIterator<ClientConnection> itCrt = serverInstance.listClConnections.listIterator();
                     int i = 0;
                     while (itCrt.hasNext())
                     {
                         ClientConnection crtConnUser = itCrt.next();
-                        msgBody += i + "] " + crtConnUser.clientUserName + "\n";
+                        msgBody.append(i).append("] ").append(crtConnUser.clientUserName).append("\n");
                         ++i;
                     }
-                    msgBody += "--------------------\n";
+                    msgBody.append("--------------------\n");
 
-                    MsgBase messageMsgList = MessageFactory.createMessage(MessageType.MESSAGE, "Server", msgBody);
+                    MsgBase messageMsgList = MessageFactory.createMessage(MessageType.MESSAGE, "Server", msgBody.toString());
                     writeMsg(messageMsgList);
                 }
                 break;
@@ -347,7 +333,7 @@ class ClientConnection extends Thread
     /**
      * Close the input and output streams.
      */
-    void closeStreams()
+    private void closeStreams()
     {
         try
         {
@@ -364,7 +350,7 @@ class ClientConnection extends Thread
     /**
      * Close the current socket between the server and the client streams.
      */
-    void closeSocket()
+    private void closeSocket()
     {
         try
         {
@@ -380,9 +366,8 @@ class ClientConnection extends Thread
      * Write a message to the associated output stream.
      *
      * @param wireMsg The message to send.
-     * @return True or false depending if the message was sent successfully.
      */
-    boolean writeMsg(MsgBase wireMsg)
+    void writeMsg(MsgBase wireMsg)
     {
         try                                    // sleep required to let the client print out the messages
         {
@@ -396,7 +381,7 @@ class ClientConnection extends Thread
         if (crtSocket.isClosed())
         {
             Server.printMessageStdOut(SrvStrTab.MESSAGE_DELIVERY_ERR.toString() + clientUserName + " [" + clientID + "]");
-            return false;
+            return;
         }
 
         try
@@ -408,20 +393,16 @@ class ClientConnection extends Thread
             Server.printMessageStdOut(SrvStrTab.MESSAGE_DELIVERY_ERR.toString() + clientUserName + " [" + clientID + "]");
         }
 
-        return true;
     }
 
-    // - Members
+    private final Server serverInstance;
+    private final Socket crtSocket;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    private volatile boolean continueLoop;
 
-    Server serverInstance;
-    Socket crtSocket;
-    ObjectInputStream inputStream;
-    ObjectOutputStream outputStream;
-    volatile boolean continueLoop;
-
-    int clientID;
-    String clientUserName;
-    MsgBase crtMessage;
+    final int clientID;
+    private String clientUserName;
 
     private static int nextAvailableUserID = 0;
 

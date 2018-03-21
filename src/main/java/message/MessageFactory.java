@@ -7,10 +7,10 @@ public final class MessageFactory
 {
     /**
      * Builds the specified type of message
-     * @param messageType
-     * @param senderID
+     * @param messageType the type of the current message
+     * @param senderID the sender of the message
      * @param body only considered if the type is MESSAGE
-     * @return
+     * @return a valid MsgBase object (can be downcasted or manipulated by this base class)
      */
     public static MsgBase createMessage(MessageType messageType, String senderID, String body)
     {

@@ -13,7 +13,7 @@ public final class ListUsersMsg extends MsgBase implements Serializable
     /**
      * Construct a list active users request object (default ctor needed for deserialization)
      */
-    protected ListUsersMsg()
+    ListUsersMsg()
     {
         msgType = MessageType.LIST_ACTIVE_USERS;
         setSenderID("");
@@ -22,9 +22,9 @@ public final class ListUsersMsg extends MsgBase implements Serializable
     /**
      * Construct from an existing object
      *
-     * @param sourceObject
+     * @param sourceObject the RHS object
      */
-    protected ListUsersMsg(final ListUsersMsg sourceObject)
+    private ListUsersMsg(final ListUsersMsg sourceObject)
     {
         setSenderID(sourceObject.getSenderID());
     }
@@ -43,7 +43,7 @@ public final class ListUsersMsg extends MsgBase implements Serializable
     /**
      * Copy the contents from the specified object
      *
-     * @param Source The source object
+     * @param sourceObject The source object
      * @return A reference to the current object
      */
     public ListUsersMsg copyContents(final ListUsersMsg sourceObject)

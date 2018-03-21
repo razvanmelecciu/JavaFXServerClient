@@ -85,7 +85,7 @@ public class FXMLDocumentController implements Initializable
             // Perform validations and if ok continue
             if (!serverPort.matches("-\\d+"))
             {
-                // invalid data msgbox
+                // TO DO
             }
             
             startClientFunctionality(serverAddress, srvPort, userName);          
@@ -175,15 +175,15 @@ public class FXMLDocumentController implements Initializable
     private TextArea  currentMessage; 
     
     private Client clInstance = null;   
-    MessagePrinter crtMsgPrinter;
-    boolean serverConnectedOk = true;
+    private MessagePrinter crtMsgPrinter;
+    private boolean serverConnectedOk = true;
     
     // - Inner classes
     
     class MessagePrinterTextArea extends MessagePrinter
     {
 
-        public MessagePrinterTextArea(String msg, TextArea crtTextArea)
+        MessagePrinterTextArea(String msg, TextArea crtTextArea)
         {
             super(msg);
         }
@@ -192,9 +192,7 @@ public class FXMLDocumentController implements Initializable
         synchronized public void flushString()
         {
             Platform.runLater(()->
-            {
-                serverMessages.appendText(crtString + "\n");
-            });
+                    serverMessages.appendText(crtString + "\n"));
         }
     }
 }

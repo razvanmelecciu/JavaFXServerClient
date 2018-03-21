@@ -2,16 +2,13 @@ package client;
 
 /**
 The string table used for the client class messages.
-@author Razvan
 */
 public enum ClientStrTab
 {
     /**
      The only compile time instances available.
-     *//**
-     The only compile time instances available.
      */
-    SRV_CONN_SUCCESFULL(0),
+    SRV_CONN_SUCCESSFUL(0),
     ERR_CONN_SERVER(1),
     STREAM_COMM_ERR(2),
     ERR_CLOSING_RES(3),
@@ -19,8 +16,8 @@ public enum ClientStrTab
     ERR_RECEIVING_SRV_EV(5),
     IMPROPER_CMD_LINE(6),
     SRV_CONN_CLOSED(7);
-    
-    private ClientStrTab(int idx)
+
+    ClientStrTab(int idx)
     {
         index = idx;
     }
@@ -55,5 +52,5 @@ public enum ClientStrTab
         return "";
     }
     
-    int index;
+    final int index;
 }

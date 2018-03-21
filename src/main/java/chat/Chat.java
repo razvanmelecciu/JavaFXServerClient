@@ -8,8 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
-
- @author Razvan
+ The main JavaFX chat application
  */
 public class Chat extends Application
 {
@@ -31,9 +30,7 @@ public class Chat extends Application
         FXMLDocumentController controller = loaderObject.getController();
 
         stage.setOnCloseRequest((WindowEvent event) ->
-        {
-            controller.HandleCLose();
-        });
+                controller.HandleCLose());
 
         stage.show();
     }
@@ -46,7 +43,8 @@ public class Chat extends Application
         launch(args);
     }
     
-    final static int initialWidth = 800, initialHeight = 420;
-    final static int minWidth = 800, minHeight = 500;
-    final static int maxWidth = 900, maxHeight = 450;
+    final private static int initialWidth = 800;
+    final private static int initialHeight = 420;
+    final private static int minWidth = 800;
+    final private static int minHeight = 500;
 }

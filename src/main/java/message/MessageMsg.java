@@ -23,7 +23,7 @@ public final class MessageMsg extends MsgBase implements Serializable
     /**
      * Construct a message object using the specified body
      */
-    protected MessageMsg(String body)
+    MessageMsg(String body)
     {
         msgType = MessageType.MESSAGE;
         setSenderID("");
@@ -33,9 +33,9 @@ public final class MessageMsg extends MsgBase implements Serializable
     /**
      * Construct from an existing object
      *
-     * @param Object
+     * @param sourceObject the RHS object
      */
-    protected MessageMsg(final MessageMsg sourceObject)
+    private MessageMsg(final MessageMsg sourceObject)
     {
         setSenderID(sourceObject.getSenderID());
         setBody(sourceObject.getMessageBody());
@@ -81,7 +81,7 @@ public final class MessageMsg extends MsgBase implements Serializable
     /**
      * Copy the contents from the specified object
      *
-     * @param Source The source object
+     * @param sourceObject The source object
      * @return A reference to the current object
      */
     public MessageMsg copyContents(final MessageMsg sourceObject)
@@ -94,13 +94,11 @@ public final class MessageMsg extends MsgBase implements Serializable
     /**
      * Sets the message body
      *
-     * @param bodyValue
-     * @return the current reference for chaining methods
+     * @param bodyValue the contents of the message
      */
-    public MessageMsg setBody(String bodyValue)
+    private void setBody(String bodyValue)
     {
         messageBody = bodyValue;
-        return this;
     }
 
     private String messageBody = "";

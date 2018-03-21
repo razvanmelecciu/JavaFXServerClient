@@ -16,7 +16,7 @@ public enum MessageType
 
     /**
      * Build this type from an integer
-     * @param index
+     * @param index the message index
      */
     MessageType(int index)
     {
@@ -55,5 +55,5 @@ public enum MessageType
 
     // - Members
 
-    int index;
-};
+    final int index;
+}
