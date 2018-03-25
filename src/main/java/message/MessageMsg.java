@@ -96,7 +96,7 @@ public final class MessageMsg extends MsgBase implements Serializable
      *
      * @param bodyValue the contents of the message
      */
-    private void setBody(String bodyValue)
+    public void setBody(String bodyValue)
     {
         messageBody = bodyValue;
     }

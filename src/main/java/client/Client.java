@@ -213,7 +213,6 @@ public class Client
 
                 while (true)
                 {
-                    System.out.print(">");
                     String command = commandScanner.nextLine();
 
                     if (command.equalsIgnoreCase(MessageType.DISCONNECT.toString()))
@@ -230,7 +229,9 @@ public class Client
                     }
                     else
                     {
-                        clInstance.SendMessage(messageMsg);
+                        MessageMsg msg = (MessageMsg) messageMsg;
+                        msg.setBody(command);
+                        clInstance.SendMessage(msg);
                     }
                 }
             }
@@ -272,14 +273,10 @@ public class Client
                         messageStringOutput = msgObject.getSenderID() + " : " + msgObject.getMessageBody();
                     }
                     else
-                    {
                         messageStringOutput = baseMsg.getSenderID() + " : " + baseMsg.getMessageType().toString();
-                    }
 
                     if (listenerStopped())
-                    {
                         return;
-                    }
 
                     crtMessagePrinter.setString(messageStringOutput);
                     crtMessagePrinter.flushString();
@@ -303,7 +300,7 @@ public class Client
 
         /**
          * Create a printer that contains the associated message
-         * @param msg
+         * @param msg Message body
          */
         MessagePrinterConsole(String msg)
         {
