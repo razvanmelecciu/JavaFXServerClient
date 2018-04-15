@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_chatapplication" default="compile.module.chatapplication">
+  <dirname property="module.chatapplication.basedir" file="${ant.file.module_chatapplication}"/>
+  
+  <property name="module.jdk.home.chatapplication" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.chatapplication" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.chatapplication" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.chatapplication" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="chatapplication.output.dir" value="${module.chatapplication.basedir}/../../out/production/ChatApplication"/>
+  <property name="chatapplication.testoutput.dir" value="${module.chatapplication.basedir}/../../out/test/ChatApplication"/>
+  
+  <path id="chatapplication.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="chatapplication.module.production.classpath">
+    <path refid="${module.jdk.classpath.chatapplication}"/>
+  </path>
+  
+  <path id="chatapplication.runtime.production.module.classpath">
+    <pathelement location="${chatapplication.output.dir}"/>
+  </path>
+  
+  <path id="chatapplication.module.classpath">
+    <path refid="${module.jdk.classpath.chatapplication}"/>
+    <pathelement location="${chatapplication.output.dir}"/>
+  </path>
+  
+  <path id="chatapplication.runtime.module.classpath">
+    <pathelement location="${chatapplication.testoutput.dir}"/>
+    <pathelement location="${chatapplication.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.chatapplication">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.chatapplication">
+    <patternset refid="excluded.from.module.chatapplication"/>
+  </patternset>
+  
+  
+  <target name="compile.module.chatapplication" depends="compile.module.chatapplication.production,compile.module.chatapplication.tests" description="Compile module ChatApplication"/>
+  
+  <target name="compile.module.chatapplication.production" depends="register.custom.compilers" description="Compile module ChatApplication; production classes"/>
+  
+  <target name="compile.module.chatapplication.tests" depends="register.custom.compilers,compile.module.chatapplication.production" description="compile module ChatApplication; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.chatapplication" description="cleanup module">
+    <delete dir="${chatapplication.output.dir}"/>
+    <delete dir="${chatapplication.testoutput.dir}"/>
+  </target>
+</project>
